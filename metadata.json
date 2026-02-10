@@ -1,0 +1,7 @@
+{
+  "name": "CampVerse",
+  "description": "A comprehensive, modern campus management system featuring Lost & Found, Notice Board, Marketplace, Student Management, and Feedback systems with role-based access control.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
