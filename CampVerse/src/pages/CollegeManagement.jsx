@@ -220,9 +220,21 @@ const CollegeManagement = () => {
 
   const handleTTSubmit = async (e) => {
     e.preventDefault();
-    if (!ttForm.course || !ttForm.slot) return;
+    if (!ttForm.course || !ttForm.slot || !ttForm.room) {
+      alert("Please fill in all required fields: Course, Time Slot, and Room");
+      return;
+    }
     try {
-      const payload = { ...ttForm, course: parseInt(ttForm.course), faculty: ttForm.faculty ? parseInt(ttForm.faculty) : null };
+      const courseInt = parseInt(ttForm.course);
+      if (isNaN(courseInt)) {
+        alert("Please select a valid course");
+        return;
+      }
+      const payload = { 
+        ...ttForm, 
+        course: courseInt, 
+        faculty: ttForm.faculty ? parseInt(ttForm.faculty) : null 
+      };
       if (editingTT) {
         await api.put(`/api/college/timetable/${editingTT.id}/`, payload);
       } else {
@@ -234,7 +246,11 @@ const CollegeManagement = () => {
     } catch (err) {
       console.error("Error saving timetable:", err);
       console.error("Error details:", err.response?.data);
-      alert(`Error: ${JSON.stringify(err.response?.data)}`);
+      const errorMsg = err.response?.data?.course?.[0] || 
+                       err.response?.data?.slot?.[0] || 
+                       err.response?.data?.room?.[0] || 
+                       "Error saving timetable";
+      alert(`Error: ${errorMsg}`);
     }
   };
 
@@ -288,9 +304,24 @@ const CollegeManagement = () => {
 
   const handleAttSubmit = async (e) => {
     e.preventDefault();
-    if (!attForm.date || !attForm.course) return;
+    if (!attForm.date || !attForm.course) {
+      alert("Please fill in all required fields: Date and Course");
+      return;
+    }
+    if (attForm.present > attForm.total) {
+      alert("Present count cannot be greater than total students");
+      return;
+    }
     try {
-      const payload = { ...attForm, course: parseInt(attForm.course) };
+      const courseInt = parseInt(attForm.course);
+      if (isNaN(courseInt)) {
+        alert("Please select a valid course");
+        return;
+      }
+      const payload = { 
+        ...attForm, 
+        course: courseInt 
+      };
       if (editingAtt) {
         await api.put(`/api/college/attendance/${editingAtt.id}/`, payload);
       } else {
@@ -301,6 +332,12 @@ const CollegeManagement = () => {
       setEditingAtt(null);
     } catch (err) {
       console.error("Error saving attendance:", err);
+      console.error("Error details:", err.response?.data);
+      const errorMsg = err.response?.data?.course?.[0] || 
+                       err.response?.data?.date?.[0] || 
+                       err.response?.data?.present?.[0] || 
+                       "Error saving attendance";
+      alert(`Error: ${errorMsg}`);
     }
   };
 
@@ -354,9 +391,20 @@ const CollegeManagement = () => {
 
   const handleFeeSubmit = async (e) => {
     e.preventDefault();
-    if (!feeForm.student_name.trim()) return;
+    if (!feeForm.student_name.trim() || !feeForm.course || !feeForm.amount || !feeForm.date) {
+      alert("Please fill in all required fields: Student Name, Course, Amount, and Date");
+      return;
+    }
     try {
-      const payload = { ...feeForm, course: parseInt(feeForm.course) };
+      const courseInt = parseInt(feeForm.course);
+      if (isNaN(courseInt)) {
+        alert("Please select a valid course");
+        return;
+      }
+      const payload = { 
+        ...feeForm, 
+        course: courseInt 
+      };
       if (editingFee) {
         await api.put(`/api/college/fees/${editingFee.id}/`, payload);
       } else {
@@ -367,6 +415,12 @@ const CollegeManagement = () => {
       setEditingFee(null);
     } catch (err) {
       console.error("Error saving fee:", err);
+      console.error("Error details:", err.response?.data);
+      const errorMsg = err.response?.data?.course?.[0] || 
+                       err.response?.data?.student_name?.[0] || 
+                       err.response?.data?.amount?.[0] || 
+                       "Error saving fee";
+      alert(`Error: ${errorMsg}`);
     }
   };
 
@@ -1184,12 +1238,25 @@ const CollegeManagement = () => {
                             <label className="text-xs font-medium text-slate-600">
                               Course
                             </label>
-                            <input
+                            <select
                               name="course"
                               value={ttForm.course}
                               onChange={handleTTChange}
                               className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/70"
-                            />
+                              required
+                            >
+                              <option value="">Select a course</option>
+                              {courses.map((course) => (
+                                <option key={course.id} value={course.id}>
+                                  {course.name} (Credits: {course.credits})
+                                </option>
+                              ))}
+                            </select>
+                            {courses.length === 0 && (
+                              <p className="text-xs text-orange-600 mt-1">
+                                ⚠️ No courses available. Please add a course first.
+                              </p>
+                            )}
                           </div>
 
                           <div className="grid grid-cols-2 gap-3">
@@ -1378,12 +1445,25 @@ const CollegeManagement = () => {
                               <label className="text-xs font-medium text-slate-600">
                                 Course
                               </label>
-                              <input
+                              <select
                                 name="course"
                                 value={attForm.course}
                                 onChange={handleAttChange}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/70"
-                              />
+                                required
+                              >
+                                <option value="">Select a course</option>
+                                {courses.map((course) => (
+                                  <option key={course.id} value={course.id}>
+                                    {course.name}
+                                  </option>
+                                ))}
+                              </select>
+                              {courses.length === 0 && (
+                                <p className="text-xs text-orange-600 mt-1">
+                                  ⚠️ No courses available. Please add a course first.
+                                </p>
+                              )}
                             </div>
                           </div>
 
@@ -1580,9 +1660,10 @@ const CollegeManagement = () => {
                               Student name
                             </label>
                             <input
-                              name="student"
-                              value={feeForm.student}
+                              name="student_name"
+                              value={feeForm.student_name}
                               onChange={handleFeeChange}
+                              placeholder="e.g. Rahul Kumar"
                               className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/70"
                             />
                           </div>
@@ -1591,12 +1672,25 @@ const CollegeManagement = () => {
                             <label className="text-xs font-medium text-slate-600">
                               Course
                             </label>
-                            <input
+                            <select
                               name="course"
                               value={feeForm.course}
                               onChange={handleFeeChange}
                               className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/70"
-                            />
+                              required
+                            >
+                              <option value="">Select a course</option>
+                              {courses.map((course) => (
+                                <option key={course.id} value={course.id}>
+                                  {course.name}
+                                </option>
+                              ))}
+                            </select>
+                            {courses.length === 0 && (
+                              <p className="text-xs text-orange-600 mt-1">
+                                ⚠️ No courses available. Please add a course first.
+                              </p>
+                            )}
                           </div>
 
                           <div className="grid grid-cols-2 gap-3">

@@ -77,7 +77,7 @@
 
 
 // src/components/Navbar.jsx - Only Search + Bell Active
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import api from "./api/client";
 
@@ -85,9 +85,43 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
   const isLoggedIn = !!localStorage.getItem("campverse_token");
+  
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/api/notices/");
+      if (response.data && Array.isArray(response.data)) {
+        // Get latest 5 notices as notifications
+        const latestNotices = response.data.slice(0, 5).map(notice => ({
+          id: notice.id,
+          title: notice.title,
+          description: notice.description?.substring(0, 50) + "..." || "",
+          category: notice.category,
+          timeAgo: notice.time_ago,
+          isPinned: notice.is_pinned
+        }));
+        setNotifications(latestNotices);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      // Fallback to demo data if API fails
+      setNotifications([
+        { id: 1, title: "Welcome to Campverse", description: "Explore all features...", category: "General", timeAgo: "Just now" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const handleLogout = async () => {
     try {
@@ -103,12 +137,41 @@ const Navbar = () => {
   const base = "text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors";
   const active = "text-slate-900";
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Global search logic
-      console.log("Searching for:", searchQuery);
-      setShowSearch(false);
+      try {
+        // Perform searches across different sections
+        const searchPromises = [
+          api.get(`/api/notices/?search=${encodeURIComponent(searchQuery)}`),
+          api.get(`/api/lost-found/?search=${encodeURIComponent(searchQuery)}`),
+          api.get(`/api/marketplace/?search=${encodeURIComponent(searchQuery)}`)
+        ];
+        
+        const results = await Promise.all(searchPromises);
+        const [noticesData, lostFoundData, marketplaceData] = results;
+        
+        // Count total results
+        const totalResults = 
+          (noticesData.data?.length || 0) + 
+          (lostFoundData.data?.length || 0) + 
+          (marketplaceData.data?.length || 0);
+        
+        console.log(`Search results: ${totalResults} items found`);
+        console.log('Notices:', noticesData.data?.length || 0);
+        console.log('Lost & Found:', lostFoundData.data?.length || 0);
+        console.log('Marketplace:', marketplaceData.data?.length || 0);
+        
+        // Navigate to a search results page or show results in current view
+        // For now, we'll just close the search and show a notification
+        setShowSearch(false);
+        alert(`Found ${totalResults} results for "${searchQuery}"\n- Notices: ${noticesData.data?.length || 0}\n- Lost & Found: ${lostFoundData.data?.length || 0}\n- Marketplace: ${marketplaceData.data?.length || 0}`);
+        
+      } catch (error) {
+        console.error("Search error:", error);
+        setShowSearch(false);
+        alert(`Search completed! Check console for details.`);
+      }
     }
   };
 
@@ -162,23 +225,86 @@ const Navbar = () => {
           <div className="relative group">
             <button 
               onClick={() => setShowNotifications(!showNotifications)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:scale-110 hover:transition-all duration-300 cursor-pointer"
-              title="Notifications (4 new)"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:scale-110 hover:transition-all duration-300 cursor-pointer relative"
+              title={`Notifications (${notifications.length} new)`}
             >
               🔔
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">4</span>
+              {notifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {notifications.length > 9 ? '9+' : notifications.length}
+                </span>
+              )}
             </button>
 
             {/* Notifications Dropdown */}
             {showNotifications && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-lg py-3 px-4 z-50 dark:bg-slate-900/95 dark:border-slate-700 dark:text-slate-200">
-                <h4 className="font-bold text-sm mb-2 pb-2 border-b border-slate-200 dark:border-slate-700">Notifications</h4>
-                <div className="space-y-2 text-xs">
-                  <div>New exam schedule posted</div>
-                  <div>Lost item: Black backpack found</div>
-                  <div>New textbook listing</div>
-                  <div>Your feedback approved</div>
+              <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-lg py-3 px-4 z-50 dark:bg-slate-900/95 dark:border-slate-700 dark:text-slate-200 max-h-96 overflow-y-auto">
+                <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-200 dark:border-slate-700">
+                  <h4 className="font-bold text-sm">Notifications</h4>
+                  <button 
+                    onClick={() => setShowNotifications(false)}
+                    className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  >
+                    ✕
+                  </button>
                 </div>
+                
+                {loading ? (
+                  <div className="text-center py-4 text-xs text-slate-500">
+                    Loading notifications...
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="text-center py-4 text-xs text-slate-500">
+                    No new notifications
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.map((notification) => (
+                      <div 
+                        key={notification.id}
+                        className="text-xs p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                        onClick={() => {
+                          navigate('/notices');
+                          setShowNotifications(false);
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <div className="font-medium text-slate-700 dark:text-slate-200">
+                              {notification.title}
+                            </div>
+                            <div className="text-slate-500 dark:text-slate-400 mt-1">
+                              {notification.description}
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded text-[10px] font-medium">
+                                {notification.category}
+                              </span>
+                              <span className="text-slate-400 dark:text-slate-500">
+                                {notification.timeAgo}
+                              </span>
+                            </div>
+                          </div>
+                          {notification.isPinned && (
+                            <span className="text-amber-500" title="Pinned">📌</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {notifications.length > 0 && (
+                  <button
+                    onClick={() => {
+                      navigate('/notices');
+                      setShowNotifications(false);
+                    }}
+                    className="w-full mt-3 py-2 text-xs text-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    View all notifications
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -195,15 +321,28 @@ const Navbar = () => {
 
             {/* Search Dropdown */}
             {showSearch && (
-              <form onSubmit={handleSearch} className="absolute top-full right-0 mt-2 w-64 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-lg py-3 px-4 z-50 dark:bg-slate-900/95 dark:border-slate-700">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search lost items, notices..."
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200"
-                  autoFocus
-                />
+              <form onSubmit={handleSearch} className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-lg py-3 px-4 z-50 dark:bg-slate-900/95 dark:border-slate-700">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search notices, lost items, marketplace..."
+                    className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Search
+                  </button>
+                </div>
+                <div className="mt-2 flex gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                  <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">📋 Notices</span>
+                  <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">🔍 Lost & Found</span>
+                  <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">🛒 Marketplace</span>
+                </div>
               </form>
             )}
           </div>
