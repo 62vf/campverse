@@ -27,8 +27,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
 
 class ItemCreateSerializer(serializers.ModelSerializer):
-    # Override fields to handle form data properly
-    image = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    image = serializers.ImageField(required=False, allow_null=True)
     old_price = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     tags = serializers.CharField(required=False, allow_blank=True)
     
@@ -55,8 +54,4 @@ class ItemCreateSerializer(serializers.ModelSerializer):
         return ret
     
     def create(self, validated_data):
-        # Remove image from validated_data if it's a URL string (not a file)
-        image_data = validated_data.pop('image', None)
-        instance = super().create(validated_data)
-        # Image will be None/blank, which is fine for placeholder images
-        return instance
+        return super().create(validated_data)

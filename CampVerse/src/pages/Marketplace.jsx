@@ -143,11 +143,7 @@ const Marketplace = () => {
         .map((t) => t.trim())
         .filter(Boolean).join(", "));
 
-      const res = await api.post("/api/marketplace/", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await api.post("/api/marketplace/", formData);
       const newItem = {
         id: res.data.id,
         title: res.data.title,

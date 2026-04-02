@@ -9,7 +9,7 @@ const Footer = () => {
   return (
     <footer className="mt-12 bg-slate-950 text-slate-200">
       <div className="max-w-6xl mx-auto px-4 py-10 md:py-12 space-y-8">
-        <div className="grid gap-8 md:grid-cols-4">
+        <div className="grid gap-8 md:grid-cols-3">
           {/* Brand */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-white">Campverse</h3>
@@ -78,28 +78,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Support */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-white">Support</h4>
-            <div className="flex flex-col gap-2 text-xs">
-              <span className="text-slate-300 hover:text-white cursor-pointer">
-                Help Center
-              </span>
-              <span className="text-slate-300 hover:text-white cursor-pointer">
-                Contact Support
-              </span>
-              <span className="text-slate-300 hover:text-white cursor-pointer">
-                Privacy Policy
-              </span>
-              <span className="text-slate-300 hover:text-white cursor-pointer">
-                Terms of Service
-              </span>
-              <span className="text-slate-300 hover:text-white cursor-pointer">
-                FAQ
-              </span>
-            </div>
-          </div>
-
           {/* Stay connected */}
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-white">
@@ -126,34 +104,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Newsletter */}
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400">
-                Subscribe to Newsletter
-              </p>
-              <div className="flex items-stretch gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="
-                    flex-1 px-3 py-2 text-xs rounded-full 
-                    bg-slate-900 border border-slate-700 text-slate-100
-                    focus:outline-none focus:ring-1 focus:ring-sky-500
-                  "
-                />
-                <button
-                  className="
-                    h-9 w-9 rounded-full 
-                    bg-sky-500 text-white text-sm font-semibold
-                    flex items-center justify-center
-                    hover:bg-sky-400
-                    transition-all duration-200
-                  "
-                >
-                  →
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 

@@ -1,34 +1,11 @@
 //src/pages/Home.jsx
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import CampusGallery from "../components/CampusGallery";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
-
-  // load theme from localStorage + apply on html
-  useEffect(() => {
-    const root = document.documentElement;
-    const saved = localStorage.getItem("theme");
-    const isDark = saved === "dark";
-    setDarkMode(isDark);
-    if (isDark) root.classList.add("dark");
-    else root.classList.remove("dark");
-  }, []);
-
-  // update html + storage when toggled
-  useEffect(() => {
-    const root = document.documentElement;
-    if (darkMode) {
-      root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
 
   return (
     <MainLayout>
@@ -39,33 +16,6 @@ const Home = () => {
           <div className="hero-bubbles pointer-events-none absolute inset-0 -z-10" />
 
           <div className="max-w-5xl mx-auto text-center space-y-6 px-4">
-            {/* theme toggle */}
-            <div className="flex justify-end mb-2">
-              <button
-                onClick={() => setDarkMode((d) => !d)}
-                className="
-                  inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                  text-xs font-medium border
-                  bg-white/80 border-slate-200 text-slate-700
-                  dark:bg-slate-900/80 dark:border-slate-700 dark:text-slate-100
-                  shadow-sm backdrop-blur
-                  transition-all duration-300
-                  hover:-translate-y-0.5 hover:shadow-md
-                "
-              >
-                <span
-                  className={`
-                    inline-flex h-4 w-4 rounded-full items-center justify-center text-[10px]
-                    transition-transform duration-300
-                    ${darkMode ? "rotate-0" : "rotate-180"}
-                  `}
-                >
-                  {darkMode ? "🌙" : "☀️"}
-                </span>
-                <span>{darkMode ? "Dark mode" : "Light mode"}</span>
-              </button>
-            </div>
-
             <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 text-xs font-medium text-blue-700 border border-blue-100 dark:bg-blue-500/10 dark:text-blue-200 dark:border-blue-500/30">
               <span className="mr-2">✨</span> Your Campus, Connected
             </div>

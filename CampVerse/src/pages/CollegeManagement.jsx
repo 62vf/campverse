@@ -59,7 +59,12 @@ const CollegeManagement = () => {
       setFaculty(facultyRes.data);
       setTimetable(timetableRes.data);
       setAttendance(attendanceRes.data);
-      setFees(feesRes.data);
+      const feeRecords = (feesRes.data || []).map((f) => ({
+        ...f,
+        student_name: f.student_name || f.student || "",
+        course_name: f.course_name || "",
+      }));
+      setFees(feeRecords);
     } catch (err) {
       console.error("Error fetching data:", err);
     } finally {
@@ -372,7 +377,7 @@ const CollegeManagement = () => {
   const openEditFeeForm = (row) => {
     setEditingFee(row);
     setFeeForm({ 
-      student_name: row.student_name, 
+      student_name: row.student_name || row.student || "", 
       course: row.course, 
       amount: parseFloat(row.amount), 
       status: row.status, 
@@ -929,7 +934,7 @@ const CollegeManagement = () => {
                             {f.name}
                           </td>
                           <td className="p-4 text-slate-700">{f.subject}</td>
-                          <td className="p-4 text-slate-700">{f.dept}</td>
+                          <td className="p-4 text-slate-700">{f.department || "-"}</td>
                           <td className="p-4 text-slate-700">{f.phone}</td>
                           <td className="p-4 text-slate-700">{f.email}</td>
                           <td className="p-4">
@@ -1024,8 +1029,8 @@ const CollegeManagement = () => {
                                 Department
                               </label>
                               <input
-                                name="dept"
-                                value={facultyForm.dept}
+                                name="department"
+                                value={facultyForm.department}
                                 onChange={handleFacultyChange}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/70"
                               />
@@ -1133,9 +1138,9 @@ const CollegeManagement = () => {
                         >
                           <td className="p-4 text-slate-800">{r.day}</td>
                           <td className="p-4 text-slate-800">{r.slot}</td>
-                          <td className="p-4 text-slate-800">{r.course}</td>
+                          <td className="p-4 text-slate-800">{r.course_name || r.course}</td>
                           <td className="p-4 text-slate-800">{r.room}</td>
-                          <td className="p-4 text-slate-800">{r.faculty}</td>
+                          <td className="p-4 text-slate-800">{r.faculty_name || "-"}</td>
                           <td className="p-4">
                             <div className="flex gap-2">
                               <button
@@ -1275,12 +1280,19 @@ const CollegeManagement = () => {
                               <label className="text-xs font-medium text-slate-600">
                                 Faculty
                               </label>
-                              <input
+                              <select
                                 name="faculty"
                                 value={ttForm.faculty}
                                 onChange={handleTTChange}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/70"
-                              />
+                              >
+                                <option value="">Select faculty (optional)</option>
+                                {faculty.map((f) => (
+                                  <option key={f.id} value={f.id}>
+                                    {f.name}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
                           </div>
 
@@ -1587,8 +1599,8 @@ const CollegeManagement = () => {
                             highlightFeeId === r.id ? "bg-emerald-50/70" : ""
                           }`}
                         >
-                          <td className="p-4 text-slate-800">{r.student}</td>
-                          <td className="p-4 text-slate-800">{r.course}</td>
+                          <td className="p-4 text-slate-800">{r.student_name || "-"}</td>
+                          <td className="p-4 text-slate-800">{r.course_name || r.course || "-"}</td>
                           <td className="p-4 font-semibold text-indigo-600">
                             ₹{r.amount.toLocaleString("en-IN")}
                           </td>

@@ -66,6 +66,17 @@ const LostFound = () => {
     }
   };
 
+  const handleDelete = async (itemId) => {
+    if (!window.confirm("Delete this lost/found item?")) return;
+    try {
+      await api.delete(`/api/lostfound/${itemId}/`);
+      setItems((prev) => prev.filter((it) => it.id !== itemId));
+    } catch (err) {
+      console.error("Error deleting item:", err);
+      alert("Failed to delete item.");
+    }
+  };
+
   if (loading) {
     return (
       <MainLayout>
@@ -201,9 +212,14 @@ const LostFound = () => {
                       <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-[11px] font-semibold ${it.status === "Lost" ? "bg-gradient-to-r from-rose-500/10 to-rose-500/25 text-rose-700" : "bg-gradient-to-r from-emerald-500/10 to-emerald-500/25 text-emerald-700"}`}>
                         {it.status}
                       </span>
-                      <button onClick={() => handleContact(it)} className="px-4 py-2 rounded-xl border border-slate-200 text-xs md:text-sm font-medium text-slate-700 bg-slate-50/80 hover:bg-slate-100 transition-all">
-                        Contact
-                      </button>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleContact(it)} className="px-4 py-2 rounded-xl border border-slate-200 text-xs md:text-sm font-medium text-slate-700 bg-slate-50/80 hover:bg-slate-100 transition-all">
+                          Contact
+                        </button>
+                        <button onClick={() => handleDelete(it.id)} className="px-4 py-2 rounded-xl border border-rose-200 text-xs md:text-sm font-medium text-rose-600 bg-rose-50/70 hover:bg-rose-100 transition-all">
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </article>
                 ))}

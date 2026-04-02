@@ -340,15 +340,19 @@ const LoginPage = ({ onLogin }) => {
 
       {/* Right Side - Forms (login / forgot / signup switch) */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         <div className="w-full max-w-md">
           {/* LOGIN */}
           {view === "login" && (
             <div className="bg-white rounded-3xl shadow-2xl p-10 transform transition-all duration-500">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl dark:shadow-[0_24px_60px_rgba(0,0,0,0.35)] p-10 transform transition-all duration-500 border border-transparent dark:border-slate-700">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-slate-800 mb-2">
+                <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-50 mb-2">
                   Sign in to Campverse
                 </h2>
                 <p className="text-slate-500">
+                <p className="text-slate-500 dark:text-slate-300">
                   Use your campus email to access all Campverse modules.
                 </p>
               </div>
@@ -357,6 +361,7 @@ const LoginPage = ({ onLogin }) => {
               <form onSubmit={handleLogin} className="space-y-5">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                     Campus Email
                   </label>
                   <div className="relative">
@@ -366,9 +371,11 @@ const LoginPage = ({ onLogin }) => {
                       onChange={handleChange}
                       type="email"
                       className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none transition text-slate-800 bg-slate-50"
+                      className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 focus:border-sky-500 focus:outline-none transition text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800"
                       placeholder="you@college.edu"
                     />
                     <span className="absolute left-4 top-4 text-slate-400">
+                    <span className="absolute left-4 top-4 text-slate-400 dark:text-slate-500">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-6 w-6"
@@ -390,6 +397,7 @@ const LoginPage = ({ onLogin }) => {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                     Password
                   </label>
                   <div className="relative">
@@ -399,8 +407,10 @@ const LoginPage = ({ onLogin }) => {
                       onChange={handleChange}
                       type={showPassword ? "text" : "password"}
                       className="w-full pl-12 pr-12 py-4 rounded-xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none transition text-slate-800 bg-slate-50"
+                      className="w-full pl-12 pr-12 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 focus:border-sky-500 focus:outline-none transition text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800"
                       placeholder="••••••••"
                     />
+                    <span className="absolute left-4 top-4 text-slate-400 dark:text-slate-500">
                     <span className="absolute left-4 top-4 text-slate-400">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -421,6 +431,9 @@ const LoginPage = ({ onLogin }) => {
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-4 text-slate-400 hover:text-slate-600"
+                      className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+                  className="text-sm text-sky-500 hover:text-sky-600 font-medium dark:text-sky-400 dark:hover:text-sky-300"
+                  className="text-sm text-slate-600 hover:text-slate-900 font-medium dark:text-slate-300 dark:hover:text-slate-100"
                     >
                       {showPassword ? (
                         <svg
@@ -473,23 +486,20 @@ const LoginPage = ({ onLogin }) => {
               </form>
 
 
-              <div className="mt-8 space-y-4">
-                <button
-                  onClick={() => setView("forgot")}
-                  className="w-full text-sky-600 hover:text-sky-700 font-semibold text-center"
-                >
-                  Forgot your password?
-                </button>
-                <div className="text-center text-slate-600">
-                  New to Campverse?{" "}
-                  <button
-                    onClick={() => setView("signup")}
-                    className="text-sky-600 hover:text-sky-700 font-semibold"
-                  >
-                    Create account
-                  </button>
-                </div>
-              </div>
+              <div className="mt-8 space-y-4">
+                <div className="w-full text-center text-amber-600 text-sm font-semibold">
+                  Forgot your password? Uh-oh, looks like someone needs a memory upgrade! 🤔💾
+                </div>
+                <div className="text-center text-slate-600">
+                  New to Campverse?{" "}
+                  <button
+                    onClick={() => setView("signup")}
+                    className="text-sky-600 hover:text-sky-700 font-semibold"
+                  >
+                    Create account
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

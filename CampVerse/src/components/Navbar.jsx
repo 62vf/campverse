@@ -82,9 +82,9 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import api from "./api/client";
 
 const Navbar = () => {
-  const [showSearch, setShowSearch] = useState(false);
+  // const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -137,43 +137,7 @@ const Navbar = () => {
   const base = "text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors";
   const active = "text-slate-900";
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      try {
-        // Perform searches across different sections
-        const searchPromises = [
-          api.get(`/api/notices/?search=${encodeURIComponent(searchQuery)}`),
-          api.get(`/api/lost-found/?search=${encodeURIComponent(searchQuery)}`),
-          api.get(`/api/marketplace/?search=${encodeURIComponent(searchQuery)}`)
-        ];
-        
-        const results = await Promise.all(searchPromises);
-        const [noticesData, lostFoundData, marketplaceData] = results;
-        
-        // Count total results
-        const totalResults = 
-          (noticesData.data?.length || 0) + 
-          (lostFoundData.data?.length || 0) + 
-          (marketplaceData.data?.length || 0);
-        
-        console.log(`Search results: ${totalResults} items found`);
-        console.log('Notices:', noticesData.data?.length || 0);
-        console.log('Lost & Found:', lostFoundData.data?.length || 0);
-        console.log('Marketplace:', marketplaceData.data?.length || 0);
-        
-        // Navigate to a search results page or show results in current view
-        // For now, we'll just close the search and show a notification
-        setShowSearch(false);
-        alert(`Found ${totalResults} results for "${searchQuery}"\n- Notices: ${noticesData.data?.length || 0}\n- Lost & Found: ${lostFoundData.data?.length || 0}\n- Marketplace: ${marketplaceData.data?.length || 0}`);
-        
-      } catch (error) {
-        console.error("Search error:", error);
-        setShowSearch(false);
-        alert(`Search completed! Check console for details.`);
-      }
-    }
-  };
+  // const handleSearch = async (e) => {};
 
   return (
     <nav className="bg-white/90 backdrop-blur border-b border-slate-100 sticky top-0 z-30 dark:bg-slate-900/90 dark:border-slate-600">
@@ -309,43 +273,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Search Icon - ACTIVE */}
-          <div className="relative group">
-            <button 
-              onClick={() => setShowSearch(!showSearch)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:scale-110 hover: transition-all duration-300 cursor-pointer"
-              title="Search everything"
-            >
-              🔍
-            </button>
-
-            {/* Search Dropdown */}
-            {showSearch && (
-              <form onSubmit={handleSearch} className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-lg py-3 px-4 z-50 dark:bg-slate-900/95 dark:border-slate-700">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search notices, lost items, marketplace..."
-                    className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    Search
-                  </button>
-                </div>
-                <div className="mt-2 flex gap-2 text-[10px] text-slate-500 dark:text-slate-400">
-                  <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">📋 Notices</span>
-                  <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">🔍 Lost & Found</span>
-                  <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">🛒 Marketplace</span>
-                </div>
-              </form>
-            )}
-          </div>
+          {/* Search Icon - REMOVED */}
 
           {/* Login / Logout */}
           {isLoggedIn ? (

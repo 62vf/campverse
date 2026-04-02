@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const AuthLayout = ({ title, subtitle, children }) => {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
       {/* Left gradient panel */}
       <div className="hidden lg:flex w-1/2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400" />
@@ -40,7 +40,7 @@ const AuthLayout = ({ title, subtitle, children }) => {
       </div>
 
       {/* Right form panel (updated white theme + animation) */}
-      <div className="flex-1 flex items-center justify-center px-4 py-10 bg-slate-50">
+      <div className="flex-1 flex items-center justify-center px-4 py-10 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         <div
           className="
             w-full max-w-md
@@ -75,10 +75,10 @@ const AuthLayout = ({ title, subtitle, children }) => {
           {/* Card (white) */}
           <div
             className="
-              bg-white 
-              border border-slate-200 
+              bg-white dark:bg-slate-900
+              border border-slate-200 dark:border-slate-700
               rounded-2xl px-5 py-6 sm:px-6 sm:py-7 
-              shadow-[0_18px_45px_rgba(15,23,42,0.12)]
+              shadow-[0_18px_45px_rgba(15,23,42,0.12)] dark:shadow-[0_18px_45px_rgba(0,0,0,0.35)]
               backdrop-blur-xl
             "
           >
